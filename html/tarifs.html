@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подписка - White Persic Renta</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        /* Основные стили */
+        :root {
+            --primary-color: #FFA07A;
+            --primary-dark: #FF8C69;
+            --bg-color: #0f172a;
+            --text-light: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-light);
+        }
+
+        /* Навигация */
+        .nav-header {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-button {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .nav-button.active {
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Основной контент */
+        .container {
+            max-width: 1200px;
+            margin: 100px auto 40px;
+            padding: 0 20px;
+        }
+
+        .tarifs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+
+        /* Карточки тарифов */
+        .tarif-card {
+            perspective: 1000px;
+            cursor: pointer;
+            min-height: 450px; /* Фиксированная минимальная высота */
+        }
+
+        .tarif-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 20px;
+        }
+
+        .tarif-card.flipped .tarif-inner {
+            transform: rotateY(180deg);
+        }
+
+        .tarif-front, .tarif-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            border-radius: 20px;
+        }
+
+        .tarif-front {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tarif-back {
+            background: linear-gradient(145deg, #0f172a, #1e293b);
+            transform: rotateY(180deg);
+            justify-content: space-between;
+        }
+
+        .tarif-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
+            color: var(--bg-color);
+            padding: 0.5rem 1.5rem;
+            border-radius: 0 20px 0 20px;
+            font-weight: 700;
+        }
+
+        .tarif-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--primary-color), #ffb347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tarif-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 1.5rem 0;
+            color: var(--primary-color);
+        }
+
+        .tarif-features {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            color: #94a3b8;
+        }
+
+        .tarif-features li {
+            padding: 1rem 0;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-subscribe {
+            width: 100%;
+            padding: 1.25rem;
+            font-size: 1.1rem;
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: auto;
+        }
+
+        /* Модальное окно */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .form-section {
+            display: block;
+        }
+
+        .qr-section {
+            display: none;
+            text-align: center;
+        }
+
+        .modal-content.qr-active .form-section {
+            display: none;
+        }
+
+        .modal-content.qr-active .qr-section {
+            display: block;
+        }
+
+        /* Элементы формы */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            background: #334155;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .insurance-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            color: var(--primary-color);
+        }
+
+        .total-sum {
+            font-size: 1.5rem;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: var(--primary-color);
+        }
+
+        #qrcode {
+            margin: 1rem auto;
+        }
+
+        .qr-instruction {
+            text-align: center;
+            margin: 1rem 0;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-header">
+        <div class="nav-container">
+            <a href="../Index.html" class="nav-button">Автомобили</a>
+            <a href="tarifs.html" class="nav-button active">Подписка</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="tarifs-grid" id="tarifs-list"></div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <button class="close-modal" id="closeModal">&times;</button>
+            
+            <div class="form-section">
+                <h3>Оформление подписки</h3>
+                <div class="form-group">
+                    <label class="form-label">Ник:</label>
+                    <input type="text" class="form-input" id="userNick" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Срок (дней):</label>
+                    <input type="number" class="form-input" id="subscribeDays" min="1" value="30" required>
+                </div>
+                <div class="insurance-info" id="insuranceField">
+                    <input type="checkbox" checked disabled>
+                    <span>Базовая страховка - +1500₽</span>
+                </div>
+                <div class="total-sum" id="totalSum">Итоговая сумма: 0₽</div>
+                <button class="btn-subscribe" id="generateQR">Оформить</button>
+            </div>
+
+            <div class="qr-section">
+                <div id="qrcode"></div>
+                <p class="qr-instruction">
+                    Теперь отправьте этот QR-код боту @WhitePersicRenta_bot
+                    <button class="btn-subscribe" onclick="location.reload()" style="margin-top:1rem">Закрыть</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Загрузка данных
+            fetch('../files/tarifs.json')
+                .then(r => r.json())
+                .then(data => {
+                    renderTarifs(data.rates);
+                    initEventListeners();
+                });
+
+            // Рендер тарифов
+            function renderTarifs(rates) {
+                const getFeatures = (rang) => {
+                    const features = {
+                        1: ['✓ Выбор из 5 авто', '✓ Постоянная поддержка', '✓ Возврат при досрочном отказе'],
+                        2: ['✓ Выбор из 10 авто', '✓ Постоянная поддержка', '✓ Возврат при досрочном отказе', '✓ Скидка 75%'],
+                        3: ['✓ Выбор из 15 авто', '✓ Постоянная поддержка', '✓ Персональный менеджер', '✓ Приоритет в обслуживании', '✓ Все авто включены', '✓ Бесплатная страховка']
+                    };
+                    return features[rang] || [];
+                }
+
+                const html = rates.map(t => `
+                    <div class="tarif-card">
+                        <div class="tarif-inner">
+                            <div class="tarif-front">
+                                <div class="tarif-badge">Ранг ${t.rang}</div>
+                                <h2 class="tarif-name">${t.name}</h2>
+                                <div class="tarif-price">${t.price}</div>
+                            </div>
+                            <div class="tarif-back">
+                                <div class="tarif-badge">Ранг ${t.rang}</div>
+                                <ul class="tarif-features">
+                                    ${getFeatures(t.rang).map(f => `<li>${f}</li>`).join('')}
+                                </ul>
+                                <button class="btn-subscribe">Оформить</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('tarifs-list').innerHTML = html;
+            }
+
+            // Инициализация событий
+            function initEventListeners() {
+                // Переворот карточек
+                document.querySelectorAll('.tarif-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        if(!e.target.closest('.btn-subscribe')) {
+                            card.classList.toggle('flipped');
+                        }
+                    });
+                });
+
+                // Модальное окно
+                let currentTariff = null;
+                const modal = document.getElementById('modalOverlay');
+                const qrCodeElement = document.getElementById('qrcode');
+
+                // Открытие модалки
+                document.querySelectorAll('.btn-subscribe').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        currentTariff = e.target.closest('.tarif-card').querySelector('.tarif-name').textContent;
+                        modal.style.display = 'flex';
+                        calculateTotal();
+                    });
+                });
+
+                // Закрытие модалки
+                document.getElementById('closeModal').addEventListener('click', closeModal);
+                modal.addEventListener('click', (e) => e.target === modal && closeModal());
+
+                // Расчет стоимости
+                function calculateTotal() {
+                    const days = parseInt(document.getElementById('subscribeDays').value) || 0;
+                    const priceMap = { 'Начальный': 20000, 'Стандартный': 50000, 'Премиум': 75000 };
+                    const pricePerDay = priceMap[currentTariff] / 30;
+                    const insurance = currentTariff !== 'Премиум' ? 1500 : 0;
+                    const total = Math.round(pricePerDay * days + insurance);
+                    
+                    document.getElementById('insuranceField').style.display = 
+                        currentTariff !== 'Премиум' ? 'flex' : 'none';
+                    
+                    document.getElementById('totalSum').textContent = 
+                        `Итоговая сумма: ${total.toLocaleString('ru-RU')}₽`;
+                }
+
+                // Генерация QR
+                document.getElementById('generateQR').addEventListener('click', () => {
+                    const nick = document.getElementById('userNick').value;
+                    const days = document.getElementById('subscribeDays').value;
+                    
+                    if(!nick || !days) return alert('Заполните все поля!');
+                    if(days < 1) return alert('Минимальный срок - 1 день');
+
+                    qrCodeElement.innerHTML = '';
+                    new QRCode(qrCodeElement, {
+                        text: JSON.stringify({
+                            tariff: currentTariff,
+                            days: days,
+                            nick: nick,
+                            total: document.getElementById('totalSum').textContent.split(': ')[1]
+                        }),
+                        width: 200,
+                        height: 200,
+                        colorDark: "#FFA07A",
+                        colorLight: "transparent",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+
+                    document.querySelector('.modal-content').classList.add('qr-active');
+                });
+
+                // Обновление суммы
+                document.getElementById('subscribeDays').addEventListener('input', calculateTotal);
+            }
+
+            function closeModal() {
+                document.querySelector('.modal-content').classList.remove('qr-active');
+                document.getElementById('modalOverlay').style.display = 'none';
+                document.getElementById('qrcode').innerHTML = '';
+            }
+        });
+    </script>
+</body>
+</html>

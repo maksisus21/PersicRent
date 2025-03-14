@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бронирование автомобиля</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #FFA07A;
+            --primary-dark: #FF8C69;
+            --bg-color: #0f172a;
+            --text-light: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-light);
+            padding: 20px;
+        }
+
+        .nav-header {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-button {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .nav-button.active {
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 100px auto 40px;
+            padding: 0 20px;
+        }
+
+        .car-detail {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .car-header {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .car-image-large {
+            width: 500px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .car-header-info {
+            flex: 1;
+        }
+
+        .car-price {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin: 15px 0;
+        }
+
+        .btn-book {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-book:hover {
+            background: var(--primary-dark);
+        }
+
+        .car-specs h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            color: #94a3b8;
+        }
+
+        .spec-grid div:nth-child(odd) {
+            font-weight: bold;
+            color: var(--text-light);
+        }
+
+        .error-message {
+            text-align: center;
+            font-size: 24px;
+            color: #ff4444;
+            padding: 50px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            background: #334155;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .insurance-options {
+            margin: 1rem 0;
+        }
+
+        .insurance-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .additional-services {
+            margin: 1rem 0;
+        }
+
+        .total-sum {
+            font-size: 1.5rem;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: var(--primary-color);
+        }
+
+        #bookingQrcode {
+            margin: 1rem auto;
+            display: none;
+        }
+
+        .qr-instruction {
+            text-align: center;
+            margin: 1rem 0;
+            color: #94a3b8;
+            display: none;
+        }
+
+        .share-button {
+            background: #4CAF50;
+            margin-left: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .car-header {
+                flex-direction: column;
+            }
+            
+            .car-image-large {
+                width: 100%;
+                height: auto;
+            }
+            
+            .spec-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-header">
+        <div class="nav-container">
+            <a href="../Index.html" class="nav-button">Автомобили</a>
+            <a href="tarifs.html" class="nav-button">Подписка</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="car-details" class="car-detail">
+            <!-- Данные будут загружены через JavaScript -->
+        </div>
+    </div>
+
+    <!-- Модальное окно бронирования -->
+    <div class="modal-overlay" id="bookingModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeBookingModal">&times;</button>
+            <div class="form-section">
+                <h3>Бронирование автомобиля</h3>
+                <div class="form-group">
+                    <label class="form-label">Ваше имя:</label>
+                    <input type="text" class="form-input" id="userName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Количество дней:</label>
+                    <input type="number" class="form-input" id="rentDays" min="1" value="1" required>
+                </div>
+                
+                <div class="insurance-options">
+                    <h4>Страховка:</h4>
+                    <div class="insurance-option">
+                        <input type="radio" name="insurance" id="insuranceMin" value="500" checked>
+                        <label for="insuranceMin">Минимум - 500₽</label>
+                    </div>
+                    <div class="insurance-option">
+                        <input type="radio" name="insurance" id="insuranceStd" value="1500">
+                        <label for="insuranceStd">Стандарт - 1500₽</label>
+                    </div>
+                    <div class="insurance-option">
+                        <input type="radio" name="insurance" id="insuranceStdPlus" value="2000">
+                        <label for="insuranceStdPlus">Стандарт+ - 2000₽</label>
+                    </div>
+                </div>
+
+                <div class="additional-services">
+                    <div class="insurance-option">
+                        <input type="checkbox" id="roadKit" value="3500">
+                        <label for="roadKit">Дорожный набор - 3500₽</label>
+                    </div>
+                </div>
+
+                <div class="total-sum" id="bookingTotal">Итоговая сумма: 0₽</div>
+                <button class="btn-subscribe" id="generateBookingQR">Оформить</button>
+            </div>
+
+            <div class="qr-section">
+                <div id="bookingQrcode"></div>
+                <p class="qr-instruction">
+                    Отсканируйте QR-код для подтверждения бронирования
+                    <div style="margin-top:1rem">
+                        <button class="btn-subscribe share-button">Поделиться</button>
+                        <button class="btn-subscribe" onclick="location.reload()">Закрыть</button>
+                    </div>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const carId = urlParams.get('id');
+            let currentCar = null;
+
+            // Загрузка данных автомобиля
+            fetch('../files/cardata.json')
+                .then(response => response.json())
+                .then(data => {
+                    const car = data.cars.find(c => c.id == carId);
+                    if (car) {
+                        currentCar = car;
+                        renderCarDetails(car);
+                    } else {
+                        renderError();
+                    }
+                })
+                .catch(error => renderError());
+
+            function renderCarDetails(car) {
+                const container = document.getElementById('car-details');
+                container.innerHTML = `
+                    <div class="car-header">
+                        <img src="${car.image}" alt="${car.name}" class="car-image-large">
+                        <div class="car-header-info">
+                            <h1>${car.name}</h1>
+                            <div class="car-price">${car.price}</div>
+                            <button class="btn-book">Забронировать</button>
+                        </div>
+                    </div>
+                    <div class="car-specs">
+                        <h2>Характеристики</h2>
+                        <div class="spec-grid">
+                            <div>Пробег:</div><div>${car.mileage}</div>
+                            <div>Разгон до 100:</div><div>${car.acceleration}</div>
+                            <div>Макс. скорость:</div><div>${car.max_speed}</div>
+                            <div>Прошивки:</div><div>${car.software.join(', ')}</div>
+                            <div>Нитро:</div><div>${car.nitro}</div>
+                            <div>Номер:</div><div>${car.plate}</div>
+                            <div>Класс:</div><div>${car.class}</div>
+                        </div>
+                    </div>
+                `;
+
+                // Инициализация бронирования
+                initBookingSystem(car);
+            }
+
+            function initBookingSystem(car) {
+                // Обработчик кнопки "Забронировать"
+                document.querySelector('.btn-book').addEventListener('click', () => {
+                    document.getElementById('bookingModal').style.display = 'flex';
+                    calculateBookingTotal(car);
+                });
+
+                // Закрытие модалки
+                document.getElementById('closeBookingModal').addEventListener('click', closeBookingModal);
+                document.getElementById('bookingModal').addEventListener('click', e => {
+                    if(e.target === e.currentTarget) closeBookingModal();
+                });
+
+                // Расчет стоимости
+                function calculateBookingTotal(car) {
+                    const days = parseInt(document.getElementById('rentDays').value) || 0;
+                    const pricePerHour = parseInt(car.price.replace(/\D/g, '')) || 0;
+                    const pricePerDay = pricePerHour * 24;
+                    const insurance = parseInt(document.querySelector('input[name="insurance"]:checked').value);
+                    const roadKit = document.getElementById('roadKit').checked ? 3500 : 0;
+                    
+                    const total = (pricePerDay * days) + insurance + roadKit;
+                    document.getElementById('bookingTotal').textContent = 
+                        `Итоговая сумма: ${total.toLocaleString('ru-RU')}₽`;
+                }
+
+                // Генерация QR-кода
+                document.getElementById('generateBookingQR').addEventListener('click', () => {
+                    const userName = document.getElementById('userName').value;
+                    const rentDays = document.getElementById('rentDays').value;
+                    
+                    if(!userName || !rentDays) {
+                        alert('Заполните все обязательные поля!');
+                        return;
+                    }
+
+                    const data = {
+                        car: currentCar.name,
+                        days: rentDays,
+                        user: userName,
+                        insurance: document.querySelector('input[name="insurance"]:checked').value,
+                        roadKit: document.getElementById('roadKit').checked,
+                        total: document.getElementById('bookingTotal').textContent.split(': ')[1]
+                    };
+
+                    document.getElementById('bookingQrcode').innerHTML = '';
+                    new QRCode(document.getElementById('bookingQrcode'), {
+                        text: JSON.stringify(data),
+                        width: 200,
+                        height: 200,
+                        colorDark: "#FFA07A",
+                        colorLight: "transparent",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+
+                    document.querySelector('.qr-section').style.display = 'block';
+                    document.querySelector('.form-section').style.display = 'none';
+                });
+
+                // Обновление суммы
+                document.getElementById('rentDays').addEventListener('input', () => calculateBookingTotal(car));
+                document.querySelectorAll('input[name="insurance"], #roadKit').forEach(input => {
+                    input.addEventListener('change', () => calculateBookingTotal(car));
+                });
+
+                // Кнопка "Поделиться"
+                document.querySelector('.share-button').addEventListener('click', () => {
+                    navigator.clipboard.writeText(window.location.href)
+                        .then(() => alert('Ссылка скопирована!'))
+                        .catch(() => alert('Ошибка копирования'));
+                });
+            }
+
+            function closeBookingModal() {
+                document.getElementById('bookingModal').style.display = 'none';
+                document.getElementById('bookingQrcode').innerHTML = '';
+                document.querySelector('.qr-section').style.display = 'none';
+                document.querySelector('.form-section').style.display = 'block';
+            }
+
+            function renderError() {
+                document.getElementById('car-details').innerHTML = `
+                    <div class="error-message">
+                        Автомобиль не найден
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

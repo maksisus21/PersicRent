@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аренда автомобилей</title>
+    <style>
+        :root {
+            --primary-color: #FFA07A;
+            --primary-dark: #FF8C69;
+            --bg-color: #0f172a;
+            --text-light: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-light);
+            padding: 20px;
+        }
+
+        .nav-header {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-button {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .nav-button.active {
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 100px auto 40px;
+            padding: 0 20px;
+        }
+
+        .cars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .car-card {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .car-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .car-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .car-content {
+            padding: 15px;
+        }
+
+        .car-title {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .car-details {
+            margin: 10px 0;
+            color: #94a3b8;
+        }
+
+        .car-details div {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-details {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-details:hover {
+            background: var(--primary-dark);
+        }
+
+        @media (max-width: 768px) {
+            .cars-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-header">
+        <div class="nav-container">
+            <a href="Index.html" class="nav-button active">Автомобили</a>
+            <a href="html/tarifs.html" class="nav-button">Подписка</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="cars-grid">
+            <!-- Audi A4 -->
+            <div class="car-card">
+                <img src="img/A4.jpg" alt="Audi A4" class="car-image">
+                <div class="car-content">
+                    <h3 class="car-title">Audi A4</h3>
+                    <div class="car-details">
+                        <div>
+                            <span>Пробег:</span>
+                            <span>1928 км</span>
+                        </div>
+                        <div>
+                            <span>Стоимость:</span>
+                            <span>5000 ₽/час</span>
+                        </div>
+                    </div>
+                    <a href="html/carinfo.html?id=1" class="btn-details">Подробнее</a>
+                </div>
+            </div>
+
+            <!-- BMW E30 -->
+            <div class="car-card">
+                <img src="img/E30.jpg" alt="BMW E30" class="car-image">
+                <div class="car-content">
+                    <h3 class="car-title">BMW E30</h3>
+                    <div class="car-details">
+                        <div>
+                            <span>Пробег:</span>
+                            <span>3 км</span>
+                        </div>
+                        <div>
+                            <span>Стоимость:</span>
+                            <span>3000 ₽/час</span>
+                        </div>
+                    </div>
+                    <a href="html/carinfo.html?id=2" class="btn-details">Подробнее</a>
+                </div>
+            </div>
+
+            <!-- Toyota Mark II -->
+            <div class="car-card">
+                <img src="img/MarkII.jpg" alt="Toyota Mark II" class="car-image">
+                <div class="car-content">
+                    <h3 class="car-title">Toyota Mark II</h3>
+                    <div class="car-details">
+                        <div>
+                            <span>Пробег:</span>
+                            <span>5 км</span>
+                        </div>
+                        <div>
+                            <span>Стоимость:</span>
+                            <span>3800 ₽/час</span>
+                        </div>
+                    </div>
+                    <a href="html/carinfo.html?id=3" class="btn-details">Подробнее</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

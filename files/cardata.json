@@ -1,0 +1,43 @@
+{
+    "cars": [
+        {
+            "id": 1,
+            "name": "Audi A4",
+            "price": "5000 ₽/час",
+            "image": "../img/A4.jpg",
+            "mileage": "1928 км",
+            "acceleration": "4.8 сек",
+            "max_speed": "260 км/ч",
+            "software": ["Drift", "Comfort+", "Sport"],
+            "nitro": "x10",
+            "plate": "В003ВК77",
+            "class": "Средний"
+        },
+        {
+            "id": 2,
+            "name": "BMW E30",
+            "price": "3000 ₽/час",
+            "image": "../img/E30.jpg",
+            "mileage": "3 км",
+            "acceleration": "10.5 сек",
+            "max_speed": "210 км/ч",
+            "software": ["Отсутствуют"],
+            "nitro": "Отсутствуют",
+            "plate": "Отсутствуют",
+            "class": "Низкий"
+        },
+        {
+            "id": 3,
+            "name": "Toyota Mark II",
+            "price": "3800 ₽/час",
+            "image": "../img/MarkII.jpg",
+            "mileage": "5 км",
+            "acceleration": "8.2 сек",
+            "max_speed": "180 км/ч",
+            "software": ["Отсутствуют"],
+            "nitro": "Отсутствуют",
+            "plate": "Отсутствуют",
+            "class": "Низкий"
+        }
+    ]
+}
